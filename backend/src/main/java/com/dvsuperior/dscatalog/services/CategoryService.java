@@ -5,13 +5,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dvsuperior.dscatalog.dto.CategoryDTO;
 import com.dvsuperior.dscatalog.entities.Category;
 import com.dvsuperior.dscatalog.repositories.CategoryRepository;
+import com.dvsuperior.dscatalog.services.execeptions.DatabaseException;
 import com.dvsuperior.dscatalog.services.execeptions.ResourceEntityNotFoundException;
+
+import jakarta.persistence.EntityExistsException;
 
 
 @Service
@@ -40,6 +45,32 @@ public class CategoryService {
         entity.setName(dto.getName());
         entity = repository.save(entity);
         return new CategoryDTO(entity);
+    }
+
+    @Transactional
+    public CategoryDTO update(Long id, CategoryDTO dto) {
+        try {
+            Category entity = repository.getReferenceById(id);
+            entity.setName(dto.getName());
+            entity = repository.save(entity);
+            return new CategoryDTO(entity);
+        } catch (EntityExistsException e) {
+            throw new ResourceEntityNotFoundException("Id not found " + id);
+        }
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void delete(Long id) {
+        if (!repository.existsById(id)) {
+		throw new ResourceEntityNotFoundException("Recurso não encontrado");
+        }
+        try {
+                repository.deleteById(id);    		
+        }
+            catch (DataIntegrityViolationException e) {
+                throw new DatabaseException("Falha de integridade referencial");
+        }
+
     }
 
 
