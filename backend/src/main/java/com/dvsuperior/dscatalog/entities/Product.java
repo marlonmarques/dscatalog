@@ -36,7 +36,7 @@ public class Product {
         inverseJoinColumns = @jakarta.persistence.JoinColumn(name = "category_id"))
     Set<Category> categories = new HashSet<>();
 
-    public Product() {
+    public Product(long l, String string, String string2, double d, String string3) {
     }
 
 
