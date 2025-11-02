@@ -1,13 +1,10 @@
 package com.dvsuperior.dscatalog.services;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -75,9 +72,8 @@ public class ProductService {
 		throw new ResourceEntityNotFoundException("Recurso não encontrado");
         }
         try {
-                repository.deleteById(id);    		
-        }
-            catch (DataIntegrityViolationException e) {
+            repository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
                 throw new DatabaseException("Falha de integridade referencial");
         }
 
