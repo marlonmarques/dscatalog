@@ -26,7 +26,10 @@ import com.dvsuperior.dscatalog.services.execeptions.DatabaseException;
 import com.dvsuperior.dscatalog.services.execeptions.ResourceEntityNotFoundException;
 import com.dvsuperior.dscatalog.tests.Factory;
 
+import jakarta.transaction.Transactional;
+
 @ExtendWith(SpringExtension.class)
+//@Transactional
 public class ProductServiceTests {
 
     @InjectMocks
@@ -132,4 +135,6 @@ public class ProductServiceTests {
             service.delete(dependentId);
         });
     }
+
+
 }

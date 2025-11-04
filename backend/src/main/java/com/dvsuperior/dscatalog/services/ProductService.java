@@ -20,6 +20,7 @@ import com.dvsuperior.dscatalog.services.execeptions.DatabaseException;
 import com.dvsuperior.dscatalog.services.execeptions.ResourceEntityNotFoundException;
 
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 
 
 @Service
@@ -61,7 +62,7 @@ public class ProductService {
             copyDtoToEntity(dto, entity);
             entity = repository.save(entity);
             return new ProductDTO(entity);
-        } catch (EntityExistsException e) {
+        } catch (EntityNotFoundException e) {
             throw new ResourceEntityNotFoundException("Id not found " + id);
         }
     }
