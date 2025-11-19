@@ -1,10 +1,14 @@
 package com.dvsuperior.dscatalog.services;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,12 +18,13 @@ import com.dvsuperior.dscatalog.dto.CategoryDTO;
 import com.dvsuperior.dscatalog.dto.ProductDTO;
 import com.dvsuperior.dscatalog.entities.Category;
 import com.dvsuperior.dscatalog.entities.Product;
+import com.dvsuperior.dscatalog.projetion.ProductProjection;
 import com.dvsuperior.dscatalog.repositories.CategoryRepository;
 import com.dvsuperior.dscatalog.repositories.ProductRepository;
 import com.dvsuperior.dscatalog.services.execeptions.DatabaseException;
 import com.dvsuperior.dscatalog.services.execeptions.ResourceEntityNotFoundException;
+import com.dvsuperior.dscatalog.util.Utils;
 
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
 
@@ -33,19 +38,30 @@ public class ProductService {
     private CategoryRepository categoryRepository;
 
 
-    @Transactional(readOnly = true)
-    public Page<ProductDTO> findAllPaged(Pageable pageable) {
-        Page<Product> list = repository.findAll(pageable);
-        return list.map(x -> new ProductDTO(x));
-    }
+	@Transactional(readOnly = true)
+	public Page<ProductDTO> findAllPaged(String categoryId, String name, Pageable pageable) {
 
-    @Transactional(readOnly = true)
-    public ProductDTO findById(Long id) {
-        Optional<Product> obj = repository.findById(id);
-        Product entity = obj.orElseThrow(() -> new ResourceEntityNotFoundException("Entity not found"));
-        return new ProductDTO(entity, entity.getCategories());
-  
-    }
+		List<Long> categoryIds = new ArrayList<>();
+		if (!"0".equals(categoryId)) {
+			categoryIds = Arrays.asList(categoryId.split(",")).stream().map(Long::parseLong).toList();						
+		}
+
+		Page<ProductProjection> page = repository.searchProducts(categoryIds, name.trim(), pageable);
+		List<Long> productIds = page.map(x -> x.getId()).toList();
+		
+		List<Product> entities = repository.searchProductsWithCategories(productIds);
+		entities = (List<Product>) Utils.replace(page.getContent(), entities);
+		List<ProductDTO> dtos = entities.stream().map(p -> new ProductDTO(p, p.getCategories())).toList();
+
+		return new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
+	}
+
+	@Transactional(readOnly = true)
+	public ProductDTO findById(Long id) {
+		Optional<Product> obj = repository.findById(id);
+		Product entity = obj.orElseThrow(() -> new ResourceEntityNotFoundException("Entity not found"));
+		return new ProductDTO(entity, entity.getCategories());
+	}
 
     @Transactional
     public ProductDTO insert(ProductDTO dto) {

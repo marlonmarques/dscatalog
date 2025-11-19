@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
@@ -28,7 +29,7 @@ import com.dvsuperior.dscatalog.services.execeptions.ResourceEntityNotFoundExcep
 import com.dvsuperior.dscatalog.tests.Factory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest(ProductResource.class)
+@WebMvcTest(value = ProductResource.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 public class ProductResourceTests {
 
     @Autowired
@@ -57,7 +58,7 @@ public class ProductResourceTests {
         productDTO = Factory.createProductDTO();
         page = new PageImpl<>(java.util.List.of(productDTO));
 
-        when(service.findAllPaged(any())).thenReturn(page);
+        when(service.findAllPaged(String.valueOf(existingId), String.valueOf(existingId), any())).thenReturn(page);
         when(service.findById(any())).thenReturn(productDTO);
         when(service.findById(existingId)).thenReturn(productDTO);
         when(service.findById(nonExistingId)).thenThrow(ResourceEntityNotFoundException.class);
