@@ -1,8 +1,9 @@
-{"properties": [{
-  "name": "cors.origins",
-  "type": "java.lang.String",
-  "description": "A description for 'cors.origins'",
-},
+{"properties": [
+  {
+    "name": "cors.origins",
+    "type": "java.lang.String",
+    "description": "A description for 'cors.origins'"
+  },
   {
     "name": "security.client-secret",
     "type": "java.lang.String",
@@ -12,5 +13,21 @@
     "name": "security.client-id",
     "type": "java.lang.String",
     "description": "A description for 'security.client-id'"
+  },
+  {
+    "name": "security.jwt.duration",
+    "type": "java.lang.String",
+    "description": "A description for 'security.jwt.duration'"
+  },
+  {
+    "name": "email.password-recover.uri",
+    "type": "java.lang.String",
+    "description": "A description for 'email.password-recover.uri'"
+  },
+  {
+    "name": "email.password-recover.token.minutes",
+    "type": "java.lang.String",
+    "description": "A description for 'email.password-recover.token.minutes'"
   }
-]}
+]
+}
