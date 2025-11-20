@@ -1,9 +1,6 @@
 package com.dvsuperior.dscatalog.resources.exceptions;
 
-import java.lang.reflect.Method;
 import java.time.Instant;
-
-import javax.xml.crypto.Data;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +9,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.dvsuperior.dscatalog.dto.CustomErrorDTO;
 import com.dvsuperior.dscatalog.services.execeptions.DatabaseException;
+import com.dvsuperior.dscatalog.services.execeptions.EmailException;
 import com.dvsuperior.dscatalog.services.execeptions.ResourceEntityNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,6 +57,13 @@ public class ResourceExceptionHendler {
             err.addError(f.getField(), f.getDefaultMessage());
         }
 
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<CustomErrorDTO> email(EmailException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        CustomErrorDTO err = new CustomErrorDTO(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 

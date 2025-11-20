@@ -30,9 +30,8 @@ import com.dvsuperior.dscatalog.services.execeptions.ResourceEntityNotFoundExcep
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
-
 @Service
-public class UserService implements UserDetailsService{
+public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -42,7 +41,6 @@ public class UserService implements UserDetailsService{
 
     @Autowired
     private RoleRepository roleRepository;
-
 
     @Transactional(readOnly = true)
     public Page<UserDTO> findAllPaged(Pageable pageable) {
@@ -55,13 +53,18 @@ public class UserService implements UserDetailsService{
         Optional<User> obj = repository.findById(id);
         User entity = obj.orElseThrow(() -> new ResourceEntityNotFoundException("Entity not found"));
         return new UserDTO(entity);
-  
+
     }
 
     @Transactional
     public UserDTO insert(UserInsertDTO dto) {
         User entity = new User();
         copyDtoToEntity(dto, entity);
+
+        entity.getRoles().clear();
+        Role role = roleRepository.findByAuthority("ROLE_OPERATOR");
+        entity.getRoles().add(role);
+
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         entity = repository.save(entity);
         return new UserDTO(entity);
@@ -82,12 +85,12 @@ public class UserService implements UserDetailsService{
     @Transactional(propagation = Propagation.SUPPORTS)
     public void delete(Long id) {
         if (!repository.existsById(id)) {
-		throw new ResourceEntityNotFoundException("Recurso não encontrado");
+            throw new ResourceEntityNotFoundException("Recurso não encontrado");
         }
         try {
             repository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-                throw new DatabaseException("Falha de integridade referencial");
+            throw new DatabaseException("Falha de integridade referencial");
         }
 
     }
