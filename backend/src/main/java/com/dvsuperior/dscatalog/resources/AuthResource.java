@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.dvsuperior.dscatalog.dto.EmailDTO;
+import com.dvsuperior.dscatalog.dto.NewPasswordDTO;
 import com.dvsuperior.dscatalog.dto.ProductDTO;
 import com.dvsuperior.dscatalog.dto.UserDTO;
 import com.dvsuperior.dscatalog.dto.UserInsertDTO;
@@ -40,19 +41,12 @@ public class AuthResource {
         authService.createRecoverToken(body);
         return ResponseEntity.noContent().build();
     }
-    /*
-    @PutMapping(value = "/reset-password")
-    public ResponseEntity<Void> resetPassword(@Valid @RequestBody NewPasswordDTO body){
-        authService.resetPassword(body);
+    
+    @PutMapping(value = "/new-password")
+    public ResponseEntity<Void> saveNewPassword(@Valid @RequestBody NewPasswordDTO body){
+        authService.saveNewPassword(body);
         return ResponseEntity.noContent().build();
     }
-
-
-    @GetMapping
-    public ResponseEntity<Void> creatRecoverToken(EmailDTO body){
-        Page<UserDTO> list = service.findAllPaged();
-        return ResponseEntity.ok().body(list);
-    }
-    */
+    
 
 }
